@@ -15,8 +15,10 @@ jobs:
         submodules: recursive 
 
     - name: Install Dependencies
-      run: |
-        brew install vlang mingw-w64
+      run: brew install vlang mingw-w64
+
+    - name: Run Tests
+      run: v test .
 
     - name: Build Mac
       run: |
