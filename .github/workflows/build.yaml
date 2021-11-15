@@ -1,0 +1,63 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        submodules: recursive 
+
+    - name: Install Dependencies
+      run: brew install vlang mingw-w64
+
+    - name: Run Tests
+      run: v test .
+
+    - name: Build Mac
+      run: |
+        v -os macos .
+        file vtest
+        chmod +x vtest
+        zip -r vtest-mac.zip vtest
+        rm vtest
+
+    - name: Build Windows
+      run: |
+        v -os windows .
+        file vtest.exe
+        chmod +x vtest.exe
+        zip -r vtest-windows.zip vtest.exe
+        rm vtest.exe
+
+    - name: Build Linux
+      run: |
+        v -os linux .
+        file vtest
+        chmod +x vtest
+        zip -r vtest-linux.zip vtest
+        rm vtest
+
+    - name: Archive Mac
+      uses: actions/upload-artifact@v1
+      with:
+        name: vtest-mac.zip
+        path: vtest-mac.zip
+
+    - name: Archive Windows
+      uses: actions/upload-artifact@v1
+      with:
+        name: vtest-windows.zip
+        path: vtest-windows.zip
+
+    - name: Archive Linux
+      uses: actions/upload-artifact@v1
+      with:
+        name: vtest-linux.zip
+        path: vtest-linux.zip
