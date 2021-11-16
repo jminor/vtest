@@ -44,6 +44,14 @@ jobs:
         zip -r vtest-linux.zip vtest
         rm vtest
 
+    - name: Build Emscripten
+      run: |
+        v -os linux -d emscripten -o vtest.c .
+        source emsdk-master/emsdk_env.sh
+        emcc -fPIC -w vtest.c -o index.js -DSOKOL_GLES2 -DSOKOL_NO_ENTRY -DNDEBUG -O3 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ALLOW_MEMORY_GROWTH -s MODULARIZE -s ASSERTIONS=1
+        file index.*
+        zip -r vtest-web.zip index.html index.js index.wasm
+
     - name: Archive Mac
       uses: actions/upload-artifact@v1
       with:
