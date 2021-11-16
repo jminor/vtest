@@ -44,6 +44,20 @@ jobs:
         zip -r vtest-linux.zip vtest
         rm vtest
 
+    - name: Build Emscripten
+      run: |
+        wget -q https://github.com/emscripten-core/emsdk/archive/master.tar.gz
+        tar -xvf master.tar.gz
+        emsdk-master/emsdk update
+        emsdk-master/emsdk install latest
+        emsdk-master/emsdk activate latest
+        source emsdk-master/emsdk_env.sh
+        v -os linux -d emscripten -o vtest.c .
+        source emsdk-master/emsdk_env.sh
+        emcc -fPIC -w vtest.c -o index.js -DSOKOL_GLES2 -DSOKOL_NO_ENTRY -DNDEBUG -O3 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ALLOW_MEMORY_GROWTH -s MODULARIZE -s ASSERTIONS=1
+        file index.*
+        zip -r vtest-web.zip index.html index.js index.wasm
+
     - name: Archive Mac
       uses: actions/upload-artifact@v1
       with:
@@ -61,3 +75,9 @@ jobs:
       with:
         name: vtest-linux.zip
         path: vtest-linux.zip
+
+    - name: Archive Web
+      uses: actions/upload-artifact@v1
+      with:
+        name: vtest-web.zip
+        path: vtest-web.zip
